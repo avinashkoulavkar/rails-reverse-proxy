@@ -55,6 +55,8 @@ module ReverseProxy
 
       # Setup headers
       target_request_headers = extract_http_request_headers(source_request.env).merge(options[:headers])
+      
+      Rails.logger.info target_request_headers.inspect
 
       target_request.initialize_http_header(target_request_headers)
 
@@ -84,7 +86,9 @@ module ReverseProxy
       http_options[:use_ssl] = (uri.scheme == "https")
       http_options[:verify_mode] = OpenSSL::SSL::VERIFY_NONE if options[:verify_ssl]
       http_options.merge!(options[:http_options]) if options[:http_options]
-
+      
+      Rails.logger.info uri.hostname
+      
       # Make the request
       Net::HTTP.start(uri.hostname, uri.port, http_options) do |http|
         target_response = http.request(target_request)
